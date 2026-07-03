@@ -23,6 +23,7 @@
     --panel:#0D1013;
     --node-mi:#35D0B4;
     --node-sm:#E8A24A;
+    --node-bio:#F2545B;
     --maxw:1140px;
     --serif:"Newsreader",Georgia,"Times New Roman",serif;
     --sans:"Inter",system-ui,-apple-system,sans-serif;
@@ -109,7 +110,6 @@
   .status{display:inline-block;font-family:var(--mono);font-size:.66rem;letter-spacing:.07em;text-transform:uppercase;padding:4px 11px;border-radius:999px;}
   .st-prep{background:rgba(199,126,40,.12);color:#8a5614;border:1px solid rgba(199,126,40,.32);}
   .st-done{background:rgba(11,110,92,.11);color:var(--accent-deep);border:1px solid rgba(11,110,92,.28);}
-  .st-active{background:rgba(11,85,150,.11);color:#0B5596;border:1px solid rgba(11,85,150,.28);}
   .plink{font-family:var(--mono);font-size:.74rem;color:var(--accent-deep);border-bottom:1px solid transparent;transition:.18s;}
   .plink:hover{border-color:var(--accent-deep);}
   .plink::after{content:" \2197";}
@@ -174,9 +174,62 @@
   @keyframes rise{to{opacity:1;transform:none;}}
 
   @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
+
+  /* ---------- SCROLL PROGRESS ---------- */
+  .scrollbar{position:fixed;top:0;left:0;height:2px;width:0%;background:linear-gradient(90deg,var(--accent),var(--node-bio));z-index:70;}
+
+  /* ---------- CURSOR GLOW ---------- */
+  .cursor-glow{position:fixed;top:0;left:0;width:460px;height:460px;border-radius:50%;pointer-events:none;z-index:1;transform:translate(-999px,-999px);background:radial-gradient(circle,rgba(11,110,92,.07),rgba(11,110,92,0) 68%);opacity:0;transition:opacity .35s ease;}
+  .cursor-glow.on{opacity:1;}
+  @media(hover:none),(pointer:coarse){.cursor-glow{display:none;}}
+
+  /* ---------- NAV DYNAMICS ---------- */
+  header.nav{transition:box-shadow .3s var(--ease);}
+  header.nav .nav-in{transition:height .3s var(--ease);}
+  header.nav.scrolled .nav-in{height:52px;}
+  header.nav.scrolled{box-shadow:0 10px 26px -20px rgba(8,20,17,.4);}
+  .nav-links{position:relative;}
+  .nav-links a{transition:color .18s,transform .22s var(--ease);}
+  .nav-links a.active{color:var(--ink);}
+  .nav-indicator{position:absolute;bottom:-5px;height:1px;background:var(--accent);left:0;width:0;opacity:0;transition:transform .4s var(--ease),width .4s var(--ease),opacity .3s ease;}
+  .nav-indicator.on{opacity:1;}
+  .brand{transition:transform .3s var(--ease);}
+
+  /* ---------- MAGNETIC ELEMENTS ---------- */
+  .btn,.tlink,.plink,.to-top,.mail{transition:transform .22s var(--ease),background .2s,border-color .2s,color .18s;}
+
+  /* ---------- SPOTLIGHT + TILT CARDS ---------- */
+  .proj,.fcard,.edu-item,.award{position:relative;}
+  .proj::before,.fcard::before{content:"";position:absolute;inset:-1px;border-radius:12px;background:radial-gradient(300px circle at var(--mx,50%) var(--my,50%),rgba(11,110,92,.09),transparent 62%);opacity:0;transition:opacity .35s ease;pointer-events:none;z-index:0;}
+  .proj:hover::before,.fcard:hover::before{opacity:1;}
+  .proj > *{position:relative;z-index:1;}
+  .fcard{transform:perspective(900px);transition:transform .28s var(--ease),border-color .2s,box-shadow .3s var(--ease);}
+  .fcard:hover{box-shadow:0 26px 46px -30px rgba(8,20,17,.3);}
+  .fcard > *{position:relative;z-index:1;}
+
+  /* chip / tag micro-hover */
+  .chip,.tag{transition:transform .2s var(--ease),border-color .18s,color .18s,background .18s;}
+  .chip:hover{transform:translateY(-2px);}
+  .tag:hover{transform:translateY(-1px);border-color:var(--accent);color:var(--accent-deep);}
+
+  /* hero parallax layers */
+  .hero-grid{perspective:1400px;}
+  .hero-left{transition:transform .15s linear;}
+  .panel{transition:transform .15s linear;}
+
+  /* ---------- BACK TO TOP ---------- */
+  .to-top{position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--paper);border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:1.05rem;cursor:pointer;opacity:0;transform:translateY(12px) scale(.9);pointer-events:none;transition:opacity .3s var(--ease),transform .3s var(--ease),background .2s,border-color .2s;z-index:55;}
+  .to-top.show{opacity:1;transform:none;pointer-events:auto;}
+  .to-top:hover{background:var(--accent-deep);border-color:var(--accent-deep);}
+
+  @media(hover:none),(pointer:coarse){.fcard,.proj{transform:none !important;}}
+  @media(prefers-reduced-motion:reduce){.cursor-glow{display:none;}.hero-left,.panel{transition:none;}}
 </style>
 </head>
 <body>
+
+<div class="scrollbar" id="scrollbar"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
 
 <header class="nav">
   <div class="wrap nav-in">
@@ -187,6 +240,7 @@
       <a href="#toolkit">Toolkit</a>
       <a href="#background">Background</a>
       <a href="#contact">Contact</a>
+      <span class="nav-indicator" id="navIndicator"></span>
     </nav>
   </div>
 </header>
@@ -268,15 +322,15 @@
       <article class="proj reveal">
         <div class="pidx">P.03</div>
         <div>
-          <h3>Biomarker discovery for autism through RNA-seq</h3>
-          <div class="role">Howlader Rising Stars Fellowship — Mentored by Rezaul Islam, Postdoc Fellow, MIT</div>
-          <p>Analyzing and processing RNA sequencing data to discover novel diagnostic and prognostic biomarkers for autism spectrum disorder. This ongoing research project is supported through the Howlader Rising Stars Fellowship.</p>
+          <h3>HOWLADER Rising Stars Fellowship — Neuroscience</h3>
+          <div class="role">Fellow — mentored by Md Rezaul Islam, PhD (Postdoctoral Fellow, MIT)</div>
+          <p>Selected as one of two undergraduate fellows nationwide for the HOWLADER Rising Stars Fellowship 2025, a mentorship and research program for Bangladeshi students pursuing careers in neuroscience. Working under the mentorship of Dr. Md Rezaul Islam, a postdoctoral fellow at MIT, on biomarker discovery for autism spectrum disorder through RNA-seq analysis, alongside guidance on graduate school preparation and research direction.</p>
           <div class="tags">
-            <span class="tag">RNA-seq</span><span class="tag">Biomarker Discovery</span><span class="tag">Autism Research</span><span class="tag">Transcriptomics</span>
+            <span class="tag">RNA-seq</span><span class="tag">Biomarker discovery</span><span class="tag">Autism spectrum disorder</span><span class="tag">Neuroscience</span>
           </div>
           <div class="pfoot">
-            <span class="status st-active">Active Fellowship</span>
-            <a class="plink" href="https://mdrezaulislam.github.io/howlader_risingstarsfellowship/" target="_blank" rel="noopener">About the Fellowship</a>
+            <span class="status st-done">Ongoing · 2025</span>
+            <a class="plink" href="https://mdrezaulislam.github.io/howlader_risingstarsfellowship/" target="_blank" rel="noopener">View fellowship</a>
           </div>
         </div>
       </article>
@@ -385,6 +439,8 @@
     </div>
   </div>
 </footer>
+
+<button class="to-top" id="toTop" type="button" aria-label="Back to top">↑</button>
 
 <script>
 /* ---------------- reveal + hero load sequence ---------------- */
@@ -626,6 +682,130 @@
 
   var to; window.addEventListener('resize', function(){ clearTimeout(to); to=setTimeout(start,180); });
   start();
+})();
+
+/* ---------------- sitewide dynamics: scroll progress, cursor glow, nav scrollspy, magnetism, tilt ---------------- */
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fine = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+  var raf;
+
+  /* ---- scroll progress bar + nav shrink + back-to-top ---- */
+  var bar = document.getElementById('scrollbar');
+  var navEl = document.querySelector('header.nav');
+  var toTop = document.getElementById('toTop');
+  function onScroll(){
+    var h = document.documentElement;
+    var scrolled = h.scrollTop || document.body.scrollTop;
+    var max = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight;
+    var pct = max>0 ? (scrolled/max)*100 : 0;
+    if(bar) bar.style.width = pct+'%';
+    if(navEl){ if(scrolled>10) navEl.classList.add('scrolled'); else navEl.classList.remove('scrolled'); }
+    if(toTop){ if(scrolled>window.innerHeight*0.7) toTop.classList.add('show'); else toTop.classList.remove('show'); }
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+  if(toTop) toTop.addEventListener('click', function(){
+    window.scrollTo({top:0, behavior: reduce?'auto':'smooth'});
+  });
+
+  /* ---- scrollspy: highlight active nav link + sliding indicator ---- */
+  var navLinksWrap = document.querySelector('.nav-links');
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav-links a'));
+  var indicator = document.getElementById('navIndicator');
+  var sections = navLinks.map(function(a){ return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+  function placeIndicator(link){
+    if(!indicator || !navLinksWrap || !link) return;
+    var wrapRect = navLinksWrap.getBoundingClientRect();
+    var r = link.getBoundingClientRect();
+    indicator.style.width = r.width+'px';
+    indicator.style.transform = 'translateX('+(r.left-wrapRect.left)+'px)';
+    indicator.classList.add('on');
+  }
+  if(sections.length && 'IntersectionObserver' in window){
+    var specter = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          var id = '#'+e.target.id;
+          navLinks.forEach(function(a){ a.classList.toggle('active', a.getAttribute('href')===id); });
+          var active = navLinks.filter(function(a){ return a.getAttribute('href')===id; })[0];
+          if(active) placeIndicator(active);
+        }
+      });
+    }, {rootMargin:'-45% 0px -50% 0px', threshold:0});
+    sections.forEach(function(s){ specter.observe(s); });
+  }
+  window.addEventListener('resize', function(){
+    var act = document.querySelector('.nav-links a.active');
+    if(act) placeIndicator(act);
+  });
+
+  /* ---- cursor glow (desktop, motion-ok only) ---- */
+  var glow = document.getElementById('cursorGlow');
+  if(glow && fine && !reduce){
+    var gx=-999, gy=-999, cur={x:-999,y:-999};
+    document.addEventListener('mousemove', function(ev){
+      cur.x=ev.clientX; cur.y=ev.clientY;
+      glow.classList.add('on');
+    });
+    document.addEventListener('mouseleave', function(){ glow.classList.remove('on'); });
+    (function glowLoop(){
+      gx += (cur.x-gx)*0.14; gy += (cur.y-gy)*0.14;
+      glow.style.transform = 'translate('+(gx-230)+'px,'+(gy-230)+'px)';
+      requestAnimationFrame(glowLoop);
+    })();
+  }
+
+  /* ---- magnetic buttons ---- */
+  if(fine && !reduce){
+    var magnets = document.querySelectorAll('.btn, .to-top');
+    magnets.forEach(function(el){
+      el.addEventListener('mousemove', function(ev){
+        var r = el.getBoundingClientRect();
+        var mx = ev.clientX - (r.left+r.width/2), my = ev.clientY - (r.top+r.height/2);
+        el.style.transform = 'translate('+(mx*0.22)+'px,'+(my*0.28)+'px)';
+      });
+      el.addEventListener('mouseleave', function(){ el.style.transform = ''; });
+    });
+  }
+
+  /* ---- spotlight + tilt for proj / focus cards ---- */
+  if(fine && !reduce){
+    var spotlightEls = document.querySelectorAll('.proj, .fcard');
+    spotlightEls.forEach(function(el){
+      var isTilt = el.classList.contains('fcard');
+      el.addEventListener('mousemove', function(ev){
+        var r = el.getBoundingClientRect();
+        var px = ((ev.clientX-r.left)/r.width)*100, py = ((ev.clientY-r.top)/r.height)*100;
+        el.style.setProperty('--mx', px+'%');
+        el.style.setProperty('--my', py+'%');
+        if(isTilt){
+          var rx = ((py-50)/50) * -5, ry = ((px-50)/50) * 5;
+          el.style.transform = 'perspective(900px) rotateX('+rx+'deg) rotateY('+ry+'deg) translateY(-2px)';
+        }
+      });
+      el.addEventListener('mouseleave', function(){
+        if(isTilt) el.style.transform = 'perspective(900px)';
+      });
+    });
+  }
+
+  /* ---- hero parallax tilt (mouse over hero section) ---- */
+  var hero = document.querySelector('.hero');
+  var heroLeft = document.querySelector('.hero-left');
+  var heroPanel = document.querySelector('.panel');
+  if(hero && fine && !reduce){
+    hero.addEventListener('mousemove', function(ev){
+      var r = hero.getBoundingClientRect();
+      var px = (ev.clientX-r.left)/r.width - 0.5, py = (ev.clientY-r.top)/r.height - 0.5;
+      if(heroLeft) heroLeft.style.transform = 'translate('+(px*-8)+'px,'+(py*-6)+'px)';
+      if(heroPanel) heroPanel.style.transform = 'rotateY('+(px*3)+'deg) rotateX('+(py*-3)+'deg)';
+    });
+    hero.addEventListener('mouseleave', function(){
+      if(heroLeft) heroLeft.style.transform = '';
+      if(heroPanel) heroPanel.style.transform = '';
+    });
+  }
 })();
 </script>
 </body>
