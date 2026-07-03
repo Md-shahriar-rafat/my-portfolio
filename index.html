@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Md Shahriar Rafat — Computational Biology</title>
+<meta name="description" content="Md Shahriar Rafat — computational biology and bioinformatics. Graph learning on molecular networks, multi-omics survival modeling, and sequence analysis at the University of Dhaka." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --paper:#F6F7F5;
+    --paper-2:#EDEFEA;
+    --card:#FCFCFB;
+    --ink:#16181B;
+    --ink-soft:#3F444A;
+    --muted:#757A81;
+    --line:#DEE0DA;
+    --line-strong:#C9CCC4;
+    --accent:#0B6E5C;
+    --accent-deep:#08594A;
+    --panel:#0D1013;
+    --node-mi:#35D0B4;
+    --node-sm:#E8A24A;
+    --maxw:1140px;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;
+    --sans:"Inter",system-ui,-apple-system,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+    --ease:cubic-bezier(.2,.65,.2,1);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--sans);font-size:16.5px;line-height:1.62;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  }
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px;}
+  .mono{font-family:var(--mono);}
+  .eyebrow{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);}
+  h1,h2,h3{font-family:var(--serif);font-weight:500;letter-spacing:-.01em;margin:0;line-height:1.12;}
+
+  /* ---------- NAV ---------- */
+  header.nav{
+    position:sticky;top:0;z-index:40;
+    backdrop-filter:saturate(1.15) blur(9px);
+    background:color-mix(in srgb,var(--paper) 84%,transparent);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:62px;}
+  .brand{font-family:var(--serif);font-weight:600;font-size:1.15rem;letter-spacing:-.01em;}
+  .brand em{color:var(--accent);font-style:normal;}
+  .nav-links{display:flex;gap:30px;}
+  .nav-links a{position:relative;font-family:var(--mono);font-size:.76rem;letter-spacing:.03em;color:var(--muted);transition:color .18s;}
+  .nav-links a::after{content:"";position:absolute;left:0;bottom:-5px;width:100%;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .28s var(--ease);}
+  .nav-links a:hover{color:var(--ink);}
+  .nav-links a:hover::after{transform:scaleX(1);}
+  @media(max-width:740px){.nav-links{display:none;}}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:76px 0 60px;border-top:none;}
+  .hero-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:56px;align-items:center;}
+  .hero-name{font-size:clamp(3rem,7vw,5.6rem);font-weight:500;margin:16px 0 0;letter-spacing:-.025em;}
+  .hero-thesis{font-family:var(--serif);font-size:clamp(1.2rem,1.9vw,1.55rem);line-height:1.42;color:var(--ink-soft);max-width:33ch;margin:22px 0 0;font-weight:400;}
+  .hero-thesis em{color:var(--accent-deep);font-style:italic;}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:9px 20px;margin-top:26px;font-family:var(--mono);font-size:.76rem;color:var(--muted);}
+  .hero-meta span{display:inline-flex;align-items:center;gap:8px;}
+  .tick{width:7px;height:7px;background:var(--accent);display:inline-block;transform:rotate(45deg);}
+  .links{display:flex;align-items:center;flex-wrap:wrap;gap:14px;margin-top:34px;}
+  .btn{font-family:var(--mono);font-size:.78rem;letter-spacing:.02em;background:var(--ink);color:var(--paper);padding:11px 20px;border-radius:8px;border:1px solid var(--ink);transition:background .2s,border-color .2s,transform .2s var(--ease);}
+  .btn:hover{background:var(--accent-deep);border-color:var(--accent-deep);color:#fff;transform:translateY(-2px);}
+  .tlink{font-family:var(--mono);font-size:.78rem;color:var(--ink-soft);padding-bottom:2px;border-bottom:1px solid var(--line-strong);transition:.18s;}
+  .tlink:hover{color:var(--accent-deep);border-color:var(--accent);}
+  .sep{color:var(--line-strong);font-family:var(--mono);}
+
+  /* graph panel */
+  .panel{position:relative;background:var(--panel);border-radius:12px;aspect-ratio:1/1;overflow:hidden;border:1px solid #22262c;box-shadow:0 30px 70px -34px rgba(8,20,17,.6);}
+  .panel canvas{display:block;width:100%;height:100%;cursor:crosshair;}
+  .panel .plabel{position:absolute;top:15px;left:17px;font-family:var(--mono);font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:#5a666c;pointer-events:none;}
+  .panel .phint{position:absolute;top:15px;right:17px;font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;color:#3f484d;pointer-events:none;}
+  .panel .legend{position:absolute;bottom:15px;left:17px;display:flex;gap:18px;font-family:var(--mono);font-size:.64rem;color:#828b91;pointer-events:none;}
+  .panel .legend i{width:9px;height:9px;display:inline-block;margin-right:7px;vertical-align:middle;}
+  .lg-mi i{background:var(--node-mi);border-radius:50%;}
+  .lg-sm i{background:var(--node-sm);transform:rotate(45deg);}
+  @media(max-width:860px){.hero-grid{grid-template-columns:1fr;gap:40px;}.panel{aspect-ratio:16/12;max-height:400px;}}
+
+  /* ---------- SECTION SHELL ---------- */
+  section{padding:70px 0;border-top:1px solid var(--line);}
+  .sec-head{display:flex;align-items:baseline;gap:18px;margin-bottom:40px;}
+  .sec-head .num{font-family:var(--mono);font-size:.78rem;color:var(--accent);letter-spacing:.05em;}
+  .sec-head h2{font-size:clamp(1.7rem,3vw,2.4rem);font-weight:500;}
+  .sec-head .aside{margin-left:auto;font-family:var(--mono);font-size:.72rem;color:var(--muted);letter-spacing:.03em;}
+  @media(max-width:640px){.sec-head .aside{display:none;}}
+
+  /* ---------- PROJECTS ---------- */
+  .proj{display:grid;grid-template-columns:70px 1fr;gap:10px 26px;padding:34px 0;border-top:1px solid var(--line);}
+  .proj:first-of-type{border-top:none;padding-top:4px;}
+  .proj .pidx{font-family:var(--mono);font-size:.8rem;color:var(--muted);padding-top:8px;letter-spacing:.04em;}
+  .proj h3{font-size:1.5rem;font-weight:500;line-height:1.2;letter-spacing:-.01em;}
+  .proj .role{font-family:var(--mono);font-size:.72rem;color:var(--accent-deep);margin-top:7px;letter-spacing:.02em;}
+  .proj p{margin:14px 0 0;color:var(--ink-soft);max-width:72ch;font-size:1rem;}
+  .proj .result{margin-top:15px;padding:2px 0 2px 16px;border-left:2px solid var(--accent);color:var(--ink);font-size:.96rem;max-width:72ch;}
+  .proj .result b{color:var(--accent-deep);font-weight:600;}
+  .tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px;}
+  .tag{font-family:var(--mono);font-size:.69rem;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:4px 10px;background:var(--paper-2);}
+  .pfoot{display:flex;align-items:center;flex-wrap:wrap;gap:16px;margin-top:18px;}
+  .status{display:inline-block;font-family:var(--mono);font-size:.66rem;letter-spacing:.07em;text-transform:uppercase;padding:4px 11px;border-radius:999px;}
+  .st-prep{background:rgba(199,126,40,.12);color:#8a5614;border:1px solid rgba(199,126,40,.32);}
+  .st-done{background:rgba(11,110,92,.11);color:var(--accent-deep);border:1px solid rgba(11,110,92,.28);}
+  .plink{font-family:var(--mono);font-size:.74rem;color:var(--accent-deep);border-bottom:1px solid transparent;transition:.18s;}
+  .plink:hover{border-color:var(--accent-deep);}
+  .plink::after{content:" \2197";}
+  @media(max-width:560px){.proj{grid-template-columns:1fr;}.proj .pidx{padding-top:0;}}
+
+  /* ---------- FOCUS ---------- */
+  .focus-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+  .fcard{border:1px solid var(--line);border-radius:11px;padding:26px 24px;background:var(--card);transition:border-color .2s,transform .2s var(--ease);}
+  .fcard:hover{border-color:var(--line-strong);transform:translateY(-3px);}
+  .fcard .fnum{font-family:var(--mono);font-size:.7rem;color:var(--accent);margin-bottom:14px;letter-spacing:.05em;}
+  .fcard h3{font-size:1.22rem;font-weight:500;margin-bottom:10px;letter-spacing:-.005em;}
+  .fcard p{margin:0;font-size:.94rem;color:var(--ink-soft);}
+  @media(max-width:860px){.focus-grid{grid-template-columns:1fr;}}
+
+  /* ---------- TOOLKIT ---------- */
+  .kit{display:grid;grid-template-columns:190px 1fr;gap:0;}
+  .krow{display:contents;}
+  .klab{font-family:var(--mono);font-size:.78rem;color:var(--muted);padding:18px 0;border-top:1px solid var(--line);letter-spacing:.02em;}
+  .kvals{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:18px 0;border-top:1px solid var(--line);}
+  .chip{font-size:.85rem;padding:6px 13px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink-soft);transition:border-color .18s,color .18s;}
+  .chip:hover{border-color:var(--accent);color:var(--accent-deep);}
+  @media(max-width:640px){.kit{grid-template-columns:1fr;}.klab{padding:16px 0 4px;border-top:1px solid var(--line);}.kvals{border-top:none;padding:4px 0 16px;}}
+
+  /* ---------- BACKGROUND ---------- */
+  .two{display:grid;grid-template-columns:1.35fr 1fr;gap:56px;}
+  .subhead{font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:22px;}
+  .edu-item{padding:20px 0;border-top:1px solid var(--line);}
+  .edu-item:first-of-type{border-top:none;padding-top:0;}
+  .edu-item h3{font-size:1.2rem;font-weight:500;}
+  .edu-item .when{font-family:var(--mono);font-size:.73rem;color:var(--muted);margin-top:5px;letter-spacing:.01em;}
+  .edu-item p{margin:9px 0 0;font-size:.93rem;color:var(--ink-soft);}
+  .award{display:flex;gap:14px;padding:13px 0;font-size:.93rem;color:var(--ink-soft);border-top:1px solid var(--line);}
+  .award:first-of-type{border-top:none;}
+  .award b{color:var(--ink);font-weight:600;}
+  .award .m{color:var(--accent);font-family:var(--mono);font-size:.82rem;}
+  @media(max-width:860px){.two{grid-template-columns:1fr;gap:44px;}}
+
+  /* ---------- FOOTER ---------- */
+  footer{border-top:1px solid var(--line-strong);padding:60px 0 52px;background:var(--paper-2);}
+  .foot-grid{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:28px;}
+  .foot-cta h2{font-size:clamp(1.9rem,3.4vw,2.7rem);font-weight:500;letter-spacing:-.01em;}
+  .foot-cta a.mail{color:var(--accent-deep);border-bottom:2px solid var(--accent);}
+  .foot-note{font-family:var(--mono);font-size:.72rem;color:var(--muted);text-align:right;line-height:2;}
+  .foot-note a{color:var(--muted);border-bottom:1px solid transparent;}
+  .foot-note a:hover{color:var(--ink);border-color:var(--line-strong);}
+  @media(max-width:560px){.foot-note{text-align:left;}}
+
+  /* ---------- MOTION (only when .js-anim is set) ---------- */
+  .js-anim .reveal{opacity:0;transform:translateY(16px);transition:opacity .7s var(--ease),transform .7s var(--ease);will-change:opacity,transform;}
+  .js-anim .reveal.in{opacity:1;transform:none;}
+  .js-anim .focus-grid .fcard:nth-child(2){transition-delay:.09s;}
+  .js-anim .focus-grid .fcard:nth-child(3){transition-delay:.18s;}
+  .js-anim .panel{opacity:0;transform:scale(.985);transition:opacity .9s var(--ease),transform .9s var(--ease);}
+  .js-anim .panel.in{opacity:1;transform:none;}
+  .js-anim .hero-left.stagger > *{opacity:0;transform:translateY(16px);}
+  .js-anim .hero-left.stagger.in > *{animation:rise .8s var(--ease) forwards;}
+  .js-anim .hero-left.stagger.in > *:nth-child(1){animation-delay:.05s;}
+  .js-anim .hero-left.stagger.in > *:nth-child(2){animation-delay:.14s;}
+  .js-anim .hero-left.stagger.in > *:nth-child(3){animation-delay:.24s;}
+  .js-anim .hero-left.stagger.in > *:nth-child(4){animation-delay:.34s;}
+  .js-anim .hero-left.stagger.in > *:nth-child(5){animation-delay:.44s;}
+  @keyframes rise{to{opacity:1;transform:none;}}
+
+  @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top">Md Shahriar Rafat<em>.</em></a>
+    <nav class="nav-links">
+      <a href="#work">Work</a>
+      <a href="#focus">Focus</a>
+      <a href="#toolkit">Toolkit</a>
+      <a href="#background">Background</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-left stagger">
+        <div class="eyebrow">Computational biology · University of Dhaka</div>
+        <h1 class="hero-name">Md Shahriar<br>Rafat</h1>
+        <p class="hero-thesis">I build end-to-end computational pipelines for molecular biology — <em>graph learning on molecular networks</em>, multi-omics survival modeling, and comparative sequence analysis.</p>
+        <div class="hero-meta">
+          <span><i class="tick"></i>Genetic Engineering &amp; Biotechnology</span>
+          <span><i class="tick"></i>Dhaka, Bangladesh</span>
+        </div>
+        <div class="links">
+          <a class="btn" href="#work">View work</a>
+          <a class="tlink" href="mailto:shahriar-2021311262@geb.du.ac.bd">Email</a>
+          <span class="sep">/</span>
+          <a class="tlink" href="https://github.com/Md-shahriar-rafat" target="_blank" rel="noopener">GitHub</a>
+          <span class="sep">/</span>
+          <a class="tlink" href="https://www.linkedin.com/in/md-shahriar-rafat-25601a26a" target="_blank" rel="noopener">LinkedIn</a>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="plabel">SmiRN-AD · message passing</div>
+        <div class="phint">hover · move cursor</div>
+        <canvas id="net" role="img" aria-label="Animated force-directed molecular association network showing message passing between miRNA and small-molecule nodes"></canvas>
+        <div class="legend">
+          <span class="lg-mi"><i></i>miRNA</span>
+          <span class="lg-sm"><i></i>small molecule</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORK -->
+  <section id="work">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="num">01</span>
+        <h2>Selected work</h2>
+        <span class="aside">research · methods</span>
+      </div>
+
+      <article class="proj reveal">
+        <div class="pidx">P.01</div>
+        <div>
+          <h3>Graph neural networks for small molecule–miRNA association in Alzheimer's disease</h3>
+          <div class="role">Lead — full pipeline, modeling, manuscript</div>
+          <p>Benchmarked graph neural networks against random-forest and network-based-inference (NBI) baselines for predicting small molecule–miRNA associations on the SmiRN-AD network. Built the pipeline end to end: GEO expression preprocessing (GSE48552), graph construction, and PyTorch Geometric models, with a leakage-safe message-passing scheme and controlled negative sampling.</p>
+          <div class="result">Leakage-safe GNN outperformed both baselines. Adding pathway/context features gave <b>no significant lift (p = 0.39)</b> — framed as an equivalence result, not buried. Degree-bias stayed low across methods.</div>
+          <div class="tags">
+            <span class="tag">Python</span><span class="tag">PyTorch Geometric</span><span class="tag">scikit-learn</span><span class="tag">NetworkX</span><span class="tag">GEO / GSE48552</span>
+          </div>
+          <div class="pfoot"><span class="status st-prep">Manuscript in preparation</span></div>
+        </div>
+      </article>
+
+      <article class="proj reveal">
+        <div class="pidx">P.02</div>
+        <div>
+          <h3>Integrated multi-omics prognostic model for hepatocellular carcinoma</h3>
+          <div class="role">Sole author — full R pipeline · public code</div>
+          <p>Built a multi-omics survival model for liver cancer (HCC) on TCGA-LIHC, fusing a 450K DNA-methylation array with RNA-seq. The pipeline pairs and normalizes IDATs in minfi, runs probe QC and KNN imputation, then applies univariate and LASSO-penalized Cox regression to derive a 9-CpG methylation signature and a 6-gene expression signature, combined into one integrated patient risk score.</p>
+          <div class="result">Validated with 10-fold cross-validation and 1,000-iteration bootstrap resampling. Reports <b>time-dependent ROC, Kaplan–Meier survival separation, and GO enrichment</b> on the gene signature. Full pipeline is public and re-runnable.</div>
+          <div class="tags">
+            <span class="tag">R</span><span class="tag">minfi</span><span class="tag">TCGAbiolinks</span><span class="tag">glmnet (LASSO-Cox)</span><span class="tag">survival / timeROC</span><span class="tag">clusterProfiler</span>
+          </div>
+          <div class="pfoot">
+            <span class="status st-done">Public code · reproducible</span>
+            <a class="plink" href="https://github.com/Md-shahriar-rafat/HCC-integrated-model-using-methylation-and-gene-expression-data" target="_blank" rel="noopener">View repository</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="proj reveal">
+        <div class="pidx">P.03</div>
+        <div>
+          <h3>Comparative sequence analysis of alcohol dehydrogenase across yeast and plants</h3>
+          <div class="role">Sole author — alignment, annotation, primer design</div>
+          <p>Cross-species analysis of alcohol dehydrogenase (ADH): multiple sequence alignment in Clustal Omega, conserved-domain annotation via NCBI CD-Search, and PCR primer design for amplification. Written up as a formal, submission-formatted paper.</p>
+          <div class="tags">
+            <span class="tag">Clustal Omega</span><span class="tag">NCBI CD-Search</span><span class="tag">Primer design</span><span class="tag">Phylogenetics</span>
+          </div>
+          <div class="pfoot"><span class="status st-done">Completed · written report</span></div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- FOCUS -->
+  <section id="focus">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="num">02</span>
+        <h2>What I work on</h2>
+      </div>
+      <div class="focus-grid">
+        <div class="fcard reveal">
+          <div class="fnum">/ 01</div>
+          <h3>Graph learning on biological networks</h3>
+          <p>Framing drug–target and molecule–miRNA problems as link prediction, with attention to leakage, negative sampling, and honest baselines.</p>
+        </div>
+        <div class="fcard reveal">
+          <div class="fnum">/ 02</div>
+          <h3>Multi-omics &amp; survival modeling</h3>
+          <p>Integrating methylation and expression into penalized Cox models, validated with cross-validation and bootstrap resampling.</p>
+        </div>
+        <div class="fcard reveal">
+          <div class="fnum">/ 03</div>
+          <h3>Reproducible pipelines</h3>
+          <p>Preprocessing, sequence analysis, and modeling built to be re-run and audited — not one-off scripts.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOOLKIT -->
+  <section id="toolkit">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="num">03</span>
+        <h2>Toolkit</h2>
+        <span class="aside">what I actually reach for</span>
+      </div>
+      <div class="kit reveal">
+        <div class="krow"><div class="klab">Languages</div><div class="kvals"><span class="chip">Python</span><span class="chip">R</span></div></div>
+        <div class="krow"><div class="klab">ML / graphs</div><div class="kvals"><span class="chip">PyTorch Geometric</span><span class="chip">scikit-learn</span><span class="chip">glmnet (LASSO)</span><span class="chip">NetworkX</span></div></div>
+        <div class="krow"><div class="klab">Survival modeling</div><div class="kvals"><span class="chip">Cox regression</span><span class="chip">Kaplan–Meier</span><span class="chip">timeROC</span><span class="chip">Bootstrap / CV</span></div></div>
+        <div class="krow"><div class="klab">Bioinformatics</div><div class="kvals"><span class="chip">TCGA / GDC</span><span class="chip">minfi (methylation)</span><span class="chip">Clustal Omega</span><span class="chip">NCBI CD-Search</span><span class="chip">BLAST</span><span class="chip">GEO / expression data</span><span class="chip">Primer design</span></div></div>
+        <div class="krow"><div class="klab">Wet lab</div><div class="kvals"><span class="chip">Animal cell culture</span><span class="chip">PCR</span><span class="chip">Gel electrophoresis</span><span class="chip">Protein quantification</span><span class="chip">Biosafety</span></div></div>
+        <div class="krow"><div class="klab">Data &amp; writing</div><div class="kvals"><span class="chip">Statistics</span><span class="chip">RNA-seq analysis</span><span class="chip">Scientific writing</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BACKGROUND -->
+  <section id="background">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="num">04</span>
+        <h2>Background</h2>
+      </div>
+      <div class="two">
+        <div class="reveal">
+          <div class="subhead">Education &amp; training</div>
+          <div class="edu-item">
+            <h3>B.Sc. in Genetic Engineering &amp; Biotechnology</h3>
+            <div class="when">University of Dhaka · 2021–present · CGPA 3.90 / 4.00</div>
+            <p>Core coursework in biochemistry, molecular biology, genetics, bioinformatics, statistics, and computational science.</p>
+          </div>
+          <div class="edu-item">
+            <h3>Research assistant — GEB Lab, University of Dhaka</h3>
+            <div class="when">Jun 2022 – 2024</div>
+            <p>PCR and molecular diagnostics (protein quantification, gel electrophoresis), bacterial culture methods, and hands-on use of bioinformatics tools.</p>
+          </div>
+          <div class="edu-item">
+            <h3>Animal cell culture training — CARS</h3>
+            <div class="when">Center for Advanced Research in Sciences · Dec 2024</div>
+            <p>Cell culture, passaging, subculture, preservation, cell transfer, and biosafety.</p>
+          </div>
+        </div>
+        <div class="reveal">
+          <div class="subhead">Awards</div>
+          <div class="award"><span class="m">01</span><span><b>1st place</b>, Biochemistry Olympiad — East West University</span></div>
+          <div class="award"><span class="m">02</span><span><b>1st place</b>, Sustainable Season 1.0</span></div>
+          <div class="award"><span class="m">03</span><span><b>4th place</b>, presentation on CRISPR for a sustainable Bangladesh — BRAC University</span></div>
+          <div class="subhead" style="margin:30px 0 14px;">Languages</div>
+          <div class="award"><span class="m">—</span><span>Bangla (native) · English (professional)</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer id="contact">
+  <div class="wrap foot-grid">
+    <div class="foot-cta reveal">
+      <div class="subhead">Get in touch</div>
+      <h2>Let's talk research —<br><a class="mail" href="mailto:shahriar-2021311262@geb.du.ac.bd">shahriar-2021311262@geb.du.ac.bd</a></h2>
+    </div>
+    <div class="foot-note reveal">
+      Md Shahriar Rafat · Dhaka, Bangladesh<br>
+      <a href="https://github.com/Md-shahriar-rafat" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="https://www.linkedin.com/in/md-shahriar-rafat-25601a26a" target="_blank" rel="noopener">LinkedIn</a><br>
+      © 2026 · static single page
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ---------------- reveal + hero load sequence ---------------- */
+(function(){
+  var motionOK = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!motionOK) return; // no JS-anim: everything stays visible & static
+  var root=document.documentElement;
+  root.classList.add('js-anim');
+  window.addEventListener('load', function(){
+    requestAnimationFrame(function(){
+      var hl=document.querySelector('.hero-left'); if(hl) hl.classList.add('in');
+      var pn=document.querySelector('.panel'); if(pn) pn.classList.add('in');
+    });
+  });
+  // fallback if load already fired
+  requestAnimationFrame(function(){
+    var hl=document.querySelector('.hero-left'); if(hl) hl.classList.add('in');
+    var pn=document.querySelector('.panel'); if(pn) pn.classList.add('in');
+  });
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  },{threshold:0.14, rootMargin:'0px 0px -8% 0px'});
+  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+})();
+
+/* ---------------- network graph: force layout + message passing ---------------- */
+(function(){
+  var canvas = document.getElementById('net');
+  if(!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var W=0,H=0,DPR=1;
+  var nodes=[], edges=[], adj={};
+  var hover=-1, mouse={x:-999,y:-999}, mouseIn=false;
+  var pulses=[], flash={}, frame=0;
+
+  function cssVar(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+  var C_MI = cssVar('--node-mi') || '#35D0B4';
+  var C_SM = cssVar('--node-sm') || '#E8A24A';
+
+  var MIR = ['miR-107','miR-29a','miR-125b','miR-146a','miR-9','miR-34a','miR-153','miR-101','miR-181c','let-7','miR-212','miR-132'];
+  var SM  = ['SM-014','SM-233','SM-087','SM-159','SM-042','SM-176','SM-098','SM-201'];
+
+  function resize(){
+    DPR=Math.min(window.devicePixelRatio||1,2);
+    var r=canvas.getBoundingClientRect(); W=r.width; H=r.height;
+    canvas.width=Math.max(1,W*DPR); canvas.height=Math.max(1,H*DPR);
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+
+  function mk(type,label,i){
+    return {x:W*0.5+(Math.random()-0.5)*W*0.5, y:H*0.5+(Math.random()-0.5)*H*0.5,
+            vx:0,vy:0,type:type,label:label,deg:1,delay:i*2};
+  }
+
+  function build(){
+    nodes=[];edges=[];adj={};
+    var nSm=6,nMi=11,idx=0;
+    for(var i=0;i<nSm;i++) nodes.push(mk('sm',SM[i%SM.length],idx++));
+    for(var j=0;j<nMi;j++) nodes.push(mk('mi','hsa-'+MIR[j%MIR.length],idx++));
+    for(var k=0;k<nodes.length;k++) adj[k]=[];
+    for(var s=0;s<nSm;s++){
+      var kk=2+Math.floor(Math.random()*3), used={};
+      for(var t=0;t<kk;t++){
+        var mi=nSm+Math.floor(Math.random()*nMi);
+        if(used[mi]) continue; used[mi]=1;
+        edges.push([s,mi]); adj[s].push(mi); adj[mi].push(s);
+      }
+    }
+    for(var m=nSm;m<nSm+nMi;m++){
+      if(adj[m].length===0){ var sm=Math.floor(Math.random()*nSm); edges.push([sm,m]); adj[sm].push(m); adj[m].push(sm); }
+    }
+    for(var d=0;d<nodes.length;d++) nodes[d].deg=adj[d].length;
+  }
+
+  function simStep(){
+    var cx=W/2, cy=H/2;
+    var kRep=Math.min(W,H)*Math.min(W,H)*0.020;
+    var L=Math.min(W,H)*0.24;
+    for(var i=0;i<nodes.length;i++){
+      var a=nodes[i], fx=0, fy=0;
+      for(var j=0;j<nodes.length;j++){
+        if(i===j) continue;
+        var b=nodes[j], dx=a.x-b.x, dy=a.y-b.y, d2=dx*dx+dy*dy; if(d2<1)d2=1;
+        var d=Math.sqrt(d2), f=kRep/d2;
+        fx+=(dx/d)*f; fy+=(dy/d)*f;
+      }
+      fx+=(cx-a.x)*0.006; fy+=(cy-a.y)*0.006;
+      if(mouseIn && !reduce){
+        var mdx=a.x-mouse.x, mdy=a.y-mouse.y, md2=mdx*mdx+mdy*mdy, R=100;
+        if(md2<R*R){ var md=Math.sqrt(md2)||1, mf=(1-md/R)*5.0; fx+=(mdx/md)*mf; fy+=(mdy/md)*mf; }
+      }
+      a.fx=fx; a.fy=fy;
+    }
+    for(var e=0;e<edges.length;e++){
+      var A=nodes[edges[e][0]], B=nodes[edges[e][1]];
+      var ex=B.x-A.x, ey=B.y-A.y, ed=Math.sqrt(ex*ex+ey*ey)||1, ef=(ed-L)*0.012, ux=ex/ed, uy=ey/ed;
+      A.fx+=ux*ef; A.fy+=uy*ef; B.fx-=ux*ef; B.fy-=uy*ef;
+    }
+    var pad=26;
+    for(var k=0;k<nodes.length;k++){
+      var n=nodes[k];
+      n.vx=(n.vx+n.fx)*0.82; n.vy=(n.vy+n.fy)*0.82;
+      var sp=Math.sqrt(n.vx*n.vx+n.vy*n.vy); if(sp>3.4){n.vx*=3.4/sp;n.vy*=3.4/sp;}
+      n.x+=n.vx; n.y+=n.vy;
+      if(n.x<pad){n.x=pad;n.vx*=-.4;} if(n.x>W-pad){n.x=W-pad;n.vx*=-.4;}
+      if(n.y<pad){n.y=pad;n.vy*=-.4;} if(n.y>H-pad){n.y=H-pad;n.vy*=-.4;}
+    }
+  }
+
+  /* ---- message passing ---- */
+  function seedPulse(){
+    var pool=[]; for(var i=0;i<nodes.length;i++){ for(var d=0;d<nodes[i].deg;d++) pool.push(i); }
+    if(!pool.length) return;
+    var src=pool[Math.floor(Math.random()*pool.length)];
+    flash[src]=1; emitFrom(src, -1, 3);
+  }
+  function emitFrom(node, from, energy){
+    var ns=adj[node];
+    for(var i=0;i<ns.length;i++){
+      if(ns[i]===from) continue;
+      if(pulses.length>70) break;
+      pulses.push({a:node,b:ns[i],t:0,speed:0.014+Math.random()*0.010,energy:energy});
+    }
+  }
+  function stepPulses(){
+    for(var i=pulses.length-1;i>=0;i--){
+      var p=pulses[i]; p.t+=p.speed;
+      if(p.t>=1){
+        flash[p.b]=1;
+        if(p.energy>1 && Math.random()<0.78) emitFromSome(p.b, p.a, p.energy-1);
+        pulses.splice(i,1);
+      }
+    }
+    for(var key in flash){ flash[key]-=0.05; if(flash[key]<=0) delete flash[key]; }
+  }
+  function emitFromSome(node, from, energy){
+    var ns=adj[node];
+    for(var i=0;i<ns.length;i++){
+      if(ns[i]===from) continue;
+      if(pulses.length>70) break;
+      if(Math.random()<0.55) pulses.push({a:node,b:ns[i],t:0,speed:0.014+Math.random()*0.010,energy:energy});
+    }
+  }
+
+  function nodeRadius(n){ return (n.type==='sm'?4.5:3.4)+Math.min(n.deg,5)*0.9; }
+  function appear(n){ if(reduce) return 1; var a=(frame-n.delay)/16; return a<0?0:(a>1?1:a); }
+
+  function findHover(){
+    hover=-1; var best=1e9;
+    for(var i=0;i<nodes.length;i++){
+      var n=nodes[i], dx=n.x-mouse.x, dy=n.y-mouse.y, d=dx*dx+dy*dy, rr=(nodeRadius(n)+11); rr*=rr;
+      if(d<rr && d<best){best=d;hover=i;}
+    }
+  }
+  function hexA(hex,a){ hex=hex.replace('#',''); if(hex.length===3){hex=hex.split('').map(function(c){return c+c;}).join('');}
+    var r=parseInt(hex.substr(0,2),16),g=parseInt(hex.substr(2,2),16),b=parseInt(hex.substr(4,2),16); return 'rgba('+r+','+g+','+b+','+a+')'; }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    var vg=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.2,W/2,H/2,Math.min(W,H)*0.72);
+    vg.addColorStop(0,'rgba(255,255,255,0.02)'); vg.addColorStop(1,'rgba(0,0,0,0.28)');
+    ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+
+    var neigh={};
+    if(hover>=0){ neigh[hover]=1; for(var q=0;q<adj[hover].length;q++) neigh[adj[hover][q]]=1; }
+
+    // edges
+    for(var e=0;e<edges.length;e++){
+      var a=nodes[edges[e][0]], b=nodes[edges[e][1]];
+      var on=hover>=0 && (edges[e][0]===hover || edges[e][1]===hover);
+      ctx.lineWidth=on?1.5:0.8;
+      if(on){ var grad=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+        grad.addColorStop(0,hexA(a.type==='sm'?C_SM:C_MI,0.85)); grad.addColorStop(1,hexA(b.type==='sm'?C_SM:C_MI,0.85)); ctx.strokeStyle=grad;
+      } else { ctx.strokeStyle=hover>=0?'rgba(150,168,172,0.10)':'rgba(150,178,172,0.20)'; }
+      ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+    }
+
+    // pulses (message passing)
+    for(var pi=0;pi<pulses.length;pi++){
+      var p=pulses[pi], A=nodes[p.a], B=nodes[p.b];
+      var px=A.x+(B.x-A.x)*p.t, py=A.y+(B.y-A.y)*p.t;
+      var g=ctx.createRadialGradient(px,py,0,px,py,7);
+      g.addColorStop(0,'rgba(200,255,244,0.95)'); g.addColorStop(1,'rgba(120,230,208,0)');
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(px,py,7,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='rgba(225,255,250,0.95)'; ctx.beginPath(); ctx.arc(px,py,1.7,0,Math.PI*2); ctx.fill();
+    }
+
+    // nodes
+    for(var i=0;i<nodes.length;i++){
+      var n=nodes[i], col=n.type==='sm'?C_SM:C_MI, r=nodeRadius(n), ap=appear(n);
+      if(ap<=0) continue;
+      var active=hover<0 || neigh[i];
+      var fl=flash[i]||0;
+      var alpha=(active?1:0.25)*ap, rr=r*(0.5+0.5*ap);
+      if(active && (n.deg>=3 || i===hover || fl>0)){
+        var gl=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,rr*4.5);
+        var gi=Math.max(fl*0.6, i===hover?0.5:(n.deg>=3?0.24:0));
+        gl.addColorStop(0,hexA(col,gi)); gl.addColorStop(1,hexA(col,0));
+        ctx.fillStyle=gl; ctx.beginPath(); ctx.arc(n.x,n.y,rr*4.5,0,Math.PI*2); ctx.fill();
+      }
+      ctx.globalAlpha=alpha; ctx.fillStyle=col;
+      var drawR=rr+fl*2.2;
+      if(n.type==='sm'){ ctx.save(); ctx.translate(n.x,n.y); ctx.rotate(Math.PI/4); ctx.fillRect(-drawR,-drawR,drawR*2,drawR*2); ctx.restore(); }
+      else { ctx.beginPath(); ctx.arc(n.x,n.y,drawR,0,Math.PI*2); ctx.fill(); }
+      if(i===hover){ ctx.strokeStyle='rgba(255,255,255,0.9)'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.arc(n.x,n.y,rr+3,0,Math.PI*2); ctx.stroke(); }
+      ctx.globalAlpha=1;
+    }
+
+    // hover label
+    if(hover>=0){
+      var n2=nodes[hover]; ctx.font='11px "IBM Plex Mono", monospace';
+      var txt=n2.label, tw=ctx.measureText(txt).width, lx=n2.x+12, ly=n2.y-12;
+      if(lx+tw+12>W) lx=n2.x-12-tw-12; if(ly<14) ly=n2.y+22;
+      ctx.fillStyle='rgba(13,16,19,0.92)'; ctx.fillRect(lx-6,ly-13,tw+12,19);
+      ctx.fillStyle=n2.type==='sm'?C_SM:C_MI; ctx.fillText(txt,lx,ly+1);
+    }
+  }
+
+  var raf=null;
+  function loop(){
+    frame++;
+    if(frame%95===0) seedPulse();
+    simStep(); stepPulses(); findHover(); draw();
+    raf=requestAnimationFrame(loop);
+  }
+  function start(){
+    if(raf) cancelAnimationFrame(raf);
+    resize(); build(); frame=0; pulses=[]; flash={};
+    if(reduce){ for(var i=0;i<420;i++) simStep(); findHover(); draw(); }
+    else { for(var w=0;w<150;w++) simStep(); seedPulse(); loop(); }
+  }
+
+  canvas.addEventListener('mousemove', function(ev){
+    var r=canvas.getBoundingClientRect(); mouse.x=ev.clientX-r.left; mouse.y=ev.clientY-r.top; mouseIn=true;
+    if(reduce){ findHover(); draw(); }
+  });
+  canvas.addEventListener('mouseleave', function(){ mouse.x=-999; mouse.y=-999; mouseIn=false; if(reduce){hover=-1;draw();} });
+
+  var to; window.addEventListener('resize', function(){ clearTimeout(to); to=setTimeout(start,180); });
+  start();
+})();
+</script>
+</body>
+</html>
