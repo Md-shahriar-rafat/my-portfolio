@@ -109,6 +109,7 @@
   .status{display:inline-block;font-family:var(--mono);font-size:.66rem;letter-spacing:.07em;text-transform:uppercase;padding:4px 11px;border-radius:999px;}
   .st-prep{background:rgba(199,126,40,.12);color:#8a5614;border:1px solid rgba(199,126,40,.32);}
   .st-done{background:rgba(11,110,92,.11);color:var(--accent-deep);border:1px solid rgba(11,110,92,.28);}
+  .st-active{background:rgba(11,85,150,.11);color:#0B5596;border:1px solid rgba(11,85,150,.28);}
   .plink{font-family:var(--mono);font-size:.74rem;color:var(--accent-deep);border-bottom:1px solid transparent;transition:.18s;}
   .plink:hover{border-color:var(--accent-deep);}
   .plink::after{content:" \2197";}
@@ -267,13 +268,16 @@
       <article class="proj reveal">
         <div class="pidx">P.03</div>
         <div>
-          <h3>Comparative sequence analysis of alcohol dehydrogenase across yeast and plants</h3>
-          <div class="role">Sole author — alignment, annotation, primer design</div>
-          <p>Cross-species analysis of alcohol dehydrogenase (ADH): multiple sequence alignment in Clustal Omega, conserved-domain annotation via NCBI CD-Search, and PCR primer design for amplification. Written up as a formal, submission-formatted paper.</p>
+          <h3>Biomarker discovery for autism through RNA-seq</h3>
+          <div class="role">Howlader Rising Stars Fellowship — Mentored by Rezaul Islam, Postdoc Fellow, MIT</div>
+          <p>Analyzing and processing RNA sequencing data to discover novel diagnostic and prognostic biomarkers for autism spectrum disorder. This ongoing research project is supported through the Howlader Rising Stars Fellowship.</p>
           <div class="tags">
-            <span class="tag">Clustal Omega</span><span class="tag">NCBI CD-Search</span><span class="tag">Primer design</span><span class="tag">Phylogenetics</span>
+            <span class="tag">RNA-seq</span><span class="tag">Biomarker Discovery</span><span class="tag">Autism Research</span><span class="tag">Transcriptomics</span>
           </div>
-          <div class="pfoot"><span class="status st-done">Completed · written report</span></div>
+          <div class="pfoot">
+            <span class="status st-active">Active Fellowship</span>
+            <a class="plink" href="https://mdrezaulislam.github.io/howlader_risingstarsfellowship/" target="_blank" rel="noopener">About the Fellowship</a>
+          </div>
         </div>
       </article>
 
@@ -623,6 +627,6 @@
   var to; window.addEventListener('resize', function(){ clearTimeout(to); to=setTimeout(start,180); });
   start();
 })();
-</script> 
-</body> 
+</script>
+</body>
 </html>
